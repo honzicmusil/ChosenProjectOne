@@ -21,7 +21,7 @@ import com.google.ar.sceneform.ux.TransformableNode
 /**
  * This is an example activity that uses the Sceneform UX package to make common AR tasks easier.
  */
-class ArSceneformPoCActivity : AppCompatActivity(){
+class ArSceneformPoCActivity : AppCompatActivity() {
 
     private var arFragment: ArFragment? = null
     private var andyRenderable: ModelRenderable? = null

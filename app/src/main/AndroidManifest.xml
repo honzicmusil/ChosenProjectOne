@@ -3,8 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="honzic.arcore.kotlin.chosenprojectone">
 
-    <uses-feature android:name="android.hardware.camera.ar" android:required="true"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature
+        android:name="android.hardware.camera.ar"
+        android:required="true" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="false"
@@ -16,15 +18,17 @@
         <!-- This tag indicates that this application requires ARCore. This results in the
             application only being visible in the Google Play Store on devices that support
             ARCore. -->
-        <meta-data android:name="com.google.ar.core" android:value="required" />
+        <meta-data
+            android:name="com.google.ar.core"
+            android:value="required" />
 
         <activity
             android:name=".ArSceneformPoCActivity"
-            android:label="@string/app_name"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:exported="true"
+            android:label="@string/app_name"
             android:screenOrientation="locked"
-            android:exported="true">
+            android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
