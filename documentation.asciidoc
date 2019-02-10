@@ -1,0 +1,173 @@
+= Technical documentation
+
+The purpose of this document is to help to understand a functionality, structure of the given project, dependency management, build, configuration and how to run the application on the real device.
+
+== Build and Dependency management
+The build process and dependency management in this project is done by Gradle.
+Following text will be dedicated to specific setup and Gradle configuration of the application.
+If you wanna know more about Gradle, visit this link https://gradle.org/
+
+Each project can contain one and more build.gradle files. This project is not any different.
+Top-level build file where you can add configuration options(Kotlin version, repositories, dependencies) common to all sub-projects/modules.
+
+Sub-module build files contain configuration options specific for that module.
+In the first section you can find plugins which are used in the module - Android plugin, Kotlin plugins and plugin for ARCore scene.
+
+Next section belongs to the Android configuration and some essential version parameters which are very straight forward.
+
+The most important section for explaining is minifyEnabled and proguardFiles. In detail it is described under this link https://developer.android.com/studio/build/shrink-code
+but in short the minifyEnabled parameter indicates if your code will be reduced and unused resources from imported libraries will be removed during the build/release process.
+This can slow down the build time, but in the end an application will be faster.
+proguardFiles parameter is a point to the file which contains rules and optimizations to reduce those resources and code.
+
+The dependency section can speak for itself and we can easily skip it to the last block, which is dedicated to the Scene form plugin which generates a sbf file of 2D/3D object.
+This is more explained under this link https://developers.google.com/ar/develop/java/sceneform/import-assets
+
+== Structure and Functionality description
+=== AndroidManifest.xml
+We will start with AndroidManifest.xml file which is used to register your app in the Android and it holds the configuration during startup.
+
+Header of the file contains an android and a tools paths to their schema structures. For us is important package tag which aims to the BuildConfig of the app.
+[source,xml]
+----
+    <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        package="honzic.arcore.kotlin.chosenprojectone">
+----
+
+Indicates that app requires ARCore ("AR Required"). Ensures app is only visible in the Google Play Store on devices that support ARCore.
+[source,xml]
+----
+    <uses-feature
+        android:name="android.hardware.camera.ar"
+        android:required="true" />
+----
+
+App requires CAMERA permission.
+[source,xml]
+----
+    <uses-permission android:name="android.permission.CAMERA" />
+----
+
+Indicates that app requires ARCore ("AR Required"). Causes Google Play Store to download and install ARCore along with the app.
+[source,xml]
+----
+    <meta-data android:name="com.google.ar.core" android:value="required" />
+----
+
+In the Application tag we have an activity definition where first parameter is name of implementation of the activity behavior.
+[source,xml]
+----
+    <activity
+        android:name=".ArSceneformPoCActivity"
+        .
+        .
+        .>
+----
+
+=== activity_ux.xml
+In the activity_ux.xml file we define only layout of the screen and its type.
+Width and height has a "match_parent" and that means it will be running in the fullscreen mode.
+Attribute tools:context=".ArSceneformPoCActivity" tells us where we can find a context and its implementation.
+
+As we can see the fragment contains android:name="com.google.ar.sceneform.ux.ArFragment" which indicates that we us a fragment from the ARCore libraries.
+[source,xml]
+----
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ArSceneformPoCActivity">
+
+    <fragment
+        android:id="@+id/ux_fragment"
+        android:name="com.google.ar.sceneform.ux.ArFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</FrameLayout>
+----
+
+=== ArSceneformPoCActivity.kt
+This file is an implementation of the app behavior. ArSceneformPoCActivity object is extended by AppCompatActivity where we override onCreate method with our own functionality.
+
+First block checks if our device supports required version of Android nad OpenGL. if not, the activity ends.
+[source,java]
+----
+    if (!checkIsSupportedDeviceOrFinish(this)) {
+        return
+    }
+----
+
+Here we set our ArFragment layout as a content view and we are assigning it to arFragment variable.
+[source,java]
+----
+    setContentView(R.layout.activity_ux)
+    arFragment = supportFragmentManager.findFragmentById(R.id.ux_fragment) as ArFragment?
+----
+
+
+ModelRenderable object creates an object which we wanna insert in the space. We take resource named andy from /Res/raw/ and then we assign it to andyRenderable variable.
+Then we only set what will happen when the exception occurs.
+[source,java]
+----
+    ModelRenderable.builder()
+            .setSource(this, R.raw.andy)
+            .build()
+            .thenAccept { renderable -> andyRenderable = renderable }
+            .exceptionally {
+                val toast = Toast.makeText(this, "Unable to load andy renderable", Toast.LENGTH_LONG)
+                toast.setGravity(Gravity.CENTER, 0, 0)
+                toast.show()
+                null
+            }
+----
+
+Last block of code is dedicated to the anchoring of the object in the space where we put it.
+We set a listener in aur arFragment variable. Every time we tap in the space it puts an andy object and anchors him in the space where we taped.
+[source,java]
+----
+       arFragment!!.setOnTapArPlaneListener { hitResult: HitResult, plane: Plane, motionEvent: MotionEvent ->
+            if (andyRenderable == null) {
+                return@setOnTapArPlaneListener
+            }
+
+            // Create the Anchor.
+            val anchor = hitResult.createAnchor()
+            val anchorNode = AnchorNode(anchor)
+            anchorNode.setParent(arFragment!!.arSceneView.scene)
+
+            // Create the transformable andy and add it to the anchor.
+            val andy = TransformableNode(arFragment!!.transformationSystem)
+            andy.setParent(anchorNode)
+            andy.renderable = andyRenderable
+            andy.select()
+        }
+----
+=== Other structure
+The rest of structure of the project which is used for supportive objects and libraries.
+
+- sampledata/models - definitions of 3D/2D object
+- res/drawable - definition of backgrounds and foreground
+- res/values - definition of strings, styles, colors
+- res/mipmap - icons
+
+
+== How to run the app on a real device
+First of all you need to have an Android device with Android version 8.0 and higher.
+The app has been tested with Samsung Galaxy S7 Edge.
+
+Once you have a real device you have to enable the developers mode. To do that you have to find a build number of Android software.
+Usually it is hidden under this path Settings > About phone > Software information > Build number
+When you find it, tap seven times on it until you see a message "You are now a developer!"
+
+Then you can see Developer options in the Settings. Switch it on and also switch the USB debugging option on explicitly.
+
+Now you have to install a supportive app for ARCore technology - ARCore by Google. You can find here https://play.google.com/store/apps/details?id=com.google.ar.core
+or you can easily install it from Google Play
+
+It is time to download the whole project from GitHub: https://github.com/honzicmusil/ChosenProjectOne
+and follow the installation guide in the project description.
+
+Last thing you need to do is to connect the device over USB to your computer and hit Run button in the Android Studio.
+Note: During the start up don't lock your screen.

@@ -16,4 +16,4 @@ Rather install full standalone support described in following link -> https://gr
 ## Where to run it
 The project has been tested on a Samsung Galaxy S7 Edge device and it is fully functional. 
 You can also run the project in the Android Emulator by creating correct virtual device.
-Project itself is supported since Android 8.0 version.
+Project itself is supported since Android 8.0 version - min SDK version 26 API.
