@@ -29,11 +29,11 @@ android {
 }
 
 dependencies {
-    implementation group: 'com.google.ar.sceneform', name: 'plugin', version: '1.6.0'
+    implementation group: 'com.google.ar.sceneform', name: 'plugin', version: '1.7.0'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "com.google.ar:core:1.6.0"
-    implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.6.0'
-    implementation 'com.google.ar.sceneform:core:1.6.0'
+    implementation "com.google.ar:core:1.7.0"
+    implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.7.0'
+    implementation 'com.google.ar.sceneform:core:1.7.0'
     implementation "com.android.support:design:28.0.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:28.0.0'
